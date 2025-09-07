@@ -1,27 +1,44 @@
 package com.BoxesLegends;
 
-// REMOVA todas as importações do JavaFX
-// import javafx... (todas)
+/*
+    * IMPORTS !
+ */
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
-public class Main {
-    public static void main(String[] args) {
-        System.out.println("🎮 Gacha Collection iniciado!");
-        System.out.println("✅ Aplicação funcionando no console");
+
+/*
+     * CONECTIVIDADE !
+ */
+import com.BoxesLegends.database.DatabaseInitializer;
+
+
+
+
+
+
+/*
+    * CLASSE Main ! 
+ */
+
+ 
+public class Main extends Application {
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        // Inicializar banco de dados
+        DatabaseInitializer.initializeDatabase();
         
-        // Teste simples do banco de dados (vamos criar classes simples primeiro)
-        try {
-            System.out.println("📦 Inicializando banco de dados...");
-            // Vamos criar uma versão simples do DatabaseInitializer primeiro
-            testDatabaseConnection();
-            System.out.println("✅ Banco inicializado com sucesso!");
-        } catch (Exception e) {
-            System.out.println("❌ Erro no banco: " + e.getMessage());
-        }
+        // Carregar a tela principal
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"));
+        primaryStage.setTitle("Gacha Collection");
+        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.show();
     }
-    
-    private static void testDatabaseConnection() {
-        // Versão simples para teste
-        System.out.println("🔗 Testando conexão com banco de dados...");
-        // Aqui viria o código real de conexão
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

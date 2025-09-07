@@ -16,7 +16,7 @@ public class DatabaseConnection {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             this.connection = DriverManager.getConnection(url, username, password);
-            System.out.println("✅ Conexão com banco estabelecida!");
+            System.out.println("✔ Conexão com banco estabelecida!");
         } catch (ClassNotFoundException ex) {
             throw new SQLException("Database driver not found", ex);
         }
