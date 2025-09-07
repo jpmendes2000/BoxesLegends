@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Main Class",
+            "request": "launch",
+            "mainClass": "com.BoxesLegends.Main",
+            "projectName": "app_gacha",
+            "classPaths": [
+                "${workspaceFolder}/bin",
+                "${workspaceFolder}/lib/*.jar"
+            ],
+            "args": "",
+            "vmArgs": ""
+        },
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch with JavaFX",
+            "request": "launch",
+            "mainClass": "com.BoxesLegends.Main",
+            "vmArgs": "--module-path \"lib/javafx/lib\" --add-modules javafx.controls,javafx.fxml",
+            "classPaths": [
+                "${workspaceFolder}/bin",
+                "${workspaceFolder}/lib/*.jar"
+            ]
+        }
+    ]
+}

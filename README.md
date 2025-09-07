@@ -220,9 +220,9 @@ git push origin feature/MinhaNovaFuncionalidade
 ## 📈 Roadmap
 
 ### 🎯 Versão 1.0 (Q1 2025)
-- [x] Sistema gacha básico
-- [x] Marketplace e economia
-- [x] Sistema de amizades
+- [ ] Sistema gacha básico
+- [ ] Marketplace e economia
+- [ ] Sistema de amizades
 - [ ] Interface mobile polida
 - [ ] Testes automatizados
 - [ ] Documentação completa
