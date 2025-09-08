@@ -23,12 +23,18 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Copiar recursos (FXML, etc.)
+REM Copiar recursos (FXML, SQL, CSS, etc.)
 echo 📋 Copiando recursos...
+
 if not exist "target\classes\fxml" mkdir target\classes\fxml
+if not exist "target\classes\db" mkdir target\classes\db
+if not exist "target\classes\css" mkdir target\classes\css
+if not exist "target\classes\img" mkdir target\classes\img
+
 copy src\main\resources\fxml\*.fxml target\classes\fxml\ >nul 2>&1
 copy src\main\resources\db\*.sql target\classes\db\ >nul 2>&1
-if not exist "target\classes\db" mkdir target\classes\db
+copy src\main\resources\css\*.css target\classes\css\ >nul 2>&1
+copy src\main\resources\img\*.* target\classes\img\ >nul 2>&1
 
 echo ✅ Compilação concluída!
 echo 🚀 Para executar: run.bat

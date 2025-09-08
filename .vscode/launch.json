@@ -7,13 +7,13 @@
             "request": "launch",
             "mainClass": "com.BoxesLegends.Main",
             "vmArgs": [
-                "--module-path", "lib/javafx",
-                "--add-modules", "javafx.controls,javafx.fxml",
+                "--module-path", "${workspaceFolder}/lib/javafx",
+                "--add-modules", "javafx.controls,javafx.fxml,javafx.graphics,javafx.media",
                 "--add-opens", "javafx.fxml/javafx.fxml=ALL-UNNAMED",
                 "-Dfile.encoding=UTF-8"
             ],
             "classpath": [
-                "${workspaceFolder}/target/classes",
+                "${workspaceFolder}/bin",
                 "${workspaceFolder}/lib/jars_mssql/mssql-jdbc-12.10.1.jre11.jar"
             ],
             "console": "integratedTerminal",
@@ -25,7 +25,7 @@
             "request": "launch",
             "mainClass": "com.BoxesLegends.database.DatabaseConnection",
             "classpath": [
-                "${workspaceFolder}/target/classes",
+                "${workspaceFolder}/bin",
                 "${workspaceFolder}/lib/jars_mssql/mssql-jdbc-12.10.1.jre11.jar"
             ],
             "console": "integratedTerminal"
