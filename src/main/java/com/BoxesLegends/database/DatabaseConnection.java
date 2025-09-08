@@ -35,7 +35,6 @@ public class DatabaseConnection {
         return connection;
     }
     
-    // Mude para retornar boolean em vez de void
     public static boolean testConnection() {
         try {
             Connection conn = DriverManager.getConnection(url, username, password);
@@ -51,6 +50,26 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             System.out.println("❌ Erro na conexão: " + e.getMessage());
             return false;
+        }
+    }
+    
+    // Método main para teste direto
+    public static void main(String[] args) {
+        System.out.println("🧪 Testando DatabaseConnection...");
+        System.out.println("🔗 URL: " + url);
+        System.out.println("👤 User: " + username);
+        System.out.println();
+        
+        try {
+            boolean result = testConnection();
+            if (result) {
+                System.out.println("🎉 Sucesso! Banco está acessível.");
+            } else {
+                System.out.println("💥 Falha! Verifique configurações.");
+            }
+        } catch (Exception e) {
+            System.out.println("💥 Erro inesperado: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

@@ -3,17 +3,32 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Launch JavaFX App",
+            "name": "Launch Boxes Legends",
             "request": "launch",
             "mainClass": "com.BoxesLegends.Main",
-            "vmArgs": "--module-path \"lib/javafx\" --add-modules javafx.controls,javafx.fxml",
-            "classPaths": [
-                "bin",
-                "lib/jars_mssql/mssql-jdbc-12.10.1.jre11.jar",
-                "lib/javafx/javafx.controls.jar",
-                "lib/javafx/javafx.fxml.jar",
-                "lib/javafx/javafx.graphics.jar"
-            ]
+            "vmArgs": [
+                "--module-path", "lib/javafx",
+                "--add-modules", "javafx.controls,javafx.fxml",
+                "--add-opens", "javafx.fxml/javafx.fxml=ALL-UNNAMED",
+                "-Dfile.encoding=UTF-8"
+            ],
+            "classpath": [
+                "${workspaceFolder}/target/classes",
+                "${workspaceFolder}/lib/jars_mssql/mssql-jdbc-12.10.1.jre11.jar"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "java",
+            "name": "Test Database Connection",
+            "request": "launch",
+            "mainClass": "com.BoxesLegends.database.DatabaseConnection",
+            "classpath": [
+                "${workspaceFolder}/target/classes",
+                "${workspaceFolder}/lib/jars_mssql/mssql-jdbc-12.10.1.jre11.jar"
+            ],
+            "console": "integratedTerminal"
         }
     ]
 }
