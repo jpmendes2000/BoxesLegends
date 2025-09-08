@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.BoxesLegends</groupId>
+    <artifactId>gacha-collection</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>Gacha Collection</name>
+    <description>Aplicação completa de sistema Gacha para PC e Android</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        
+        <!-- Versões de Dependências -->
+        <javafx.version>21.0.2</javafx.version>
+        <mssql.jdbc.version>12.4.1.jre11</mssql.jdbc.version>
+        <junit.version>5.9.2</junit.version>
+        
+        <!-- Android -->
+        <android.sdk.version>33</android.sdk.version>
+        <android.build.tools.version>33.0.2</android.build.tools.version>
+    </properties>
+
+    <modules>
+        <module>core</module>
+        <module>desktop</module>
+        <module>android</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- JDBC SQL Server -->
+            <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>mssql-jdbc</artifactId>
+                <version>${mssql.jdbc.version}</version>
+            </dependency>
+
+            <!-- JavaFX (para desktop) -->
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-controls</artifactId>
+                <version>${javafx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-fxml</artifactId>
+                <version>${javafx.version}</version>
+            </dependency>
+
+            <!-- Testes -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Compilador Java -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <compilerArgs>--enable-preview</compilerArgs>
+                    </configuration>
+                </plugin>
+
+                <!-- JavaFX para Desktop -->
+                <plugin>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-maven-plugin</artifactId>
+                    <version>0.0.8</version>
+                    <configuration>
+                        <mainClass>com.BoxesLegends.desktop.DesktopLauncher</mainClass>
+                    </configuration>
+                </plugin>
+
+                <!-- Android -->
+                <plugin>
+                    <groupId>com.simpligility.maven.plugins</groupId>
+                    <artifactId>android-maven-plugin</artifactId>
+                    <version>4.6.0</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <sdk>
+                            <platform>${android.sdk.version}</platform>
+                            <buildTools>${android.build.tools.version}</buildTools>
+                        </sdk>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>desktop</id>
+            <modules>
+                <module>core</module>
+                <module>desktop</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>android</id>
+            <modules>
+                <module>core</module>
+                <module>android</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>full</id>
+            <modules>
+                <module>core</module>
+                <module>desktop</module>
+                <module>android</module>
+            </modules>
+        </profile>
+    </profiles>
+
+</project>

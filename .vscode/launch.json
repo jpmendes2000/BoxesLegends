@@ -3,32 +3,16 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Launch Main Class",
+            "name": "Launch JavaFX App",
             "request": "launch",
             "mainClass": "com.BoxesLegends.Main",
-            "projectName": "app_gacha",
+            "vmArgs": "--module-path \"lib/javafx\" --add-modules javafx.controls,javafx.fxml",
             "classPaths": [
-                "${workspaceFolder}/bin",
-                "${workspaceFolder}/lib/*.jar"
-            ],
-            "args": "",
-            "vmArgs": ""
-        },
-        {
-            "type": "java",
-            "name": "Launch Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "Launch with JavaFX",
-            "request": "launch",
-            "mainClass": "com.BoxesLegends.Main",
-            "vmArgs": "--module-path \"lib/javafx/lib\" --add-modules javafx.controls,javafx.fxml",
-            "classPaths": [
-                "${workspaceFolder}/bin",
-                "${workspaceFolder}/lib/*.jar"
+                "bin",
+                "lib/jars_mssql/mssql-jdbc-12.10.1.jre11.jar",
+                "lib/javafx/javafx.controls.jar",
+                "lib/javafx/javafx.fxml.jar",
+                "lib/javafx/javafx.graphics.jar"
             ]
         }
     ]
