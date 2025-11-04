@@ -1,6 +1,7 @@
 // pages/Admin/Cadastro_person.jsx
 import { useState, useEffect } from 'react';
 import { supabase } from './supabase';
+import InputComGaleria from '../../components/InputComGaleria';
 
 export default function CadastroPersonagem() {
   const [formData, setFormData] = useState({
@@ -138,16 +139,16 @@ export default function CadastroPersonagem() {
             rows="4"
           />
         </div>
-        
-        <div>
-          <label>Foto (URL): </label>
-          <input
-            type="text"
-            name="foto"
-            value={formData.foto}
-            onChange={handleChange}
-          />
-        </div>
+              
+      <div className="form-group">
+        <label>Foto: </label>
+        <InputComGaleria
+          value={formData.foto}
+          onChange={(url) => setFormData(prev => ({ ...prev, foto: url }))}
+          placeholder="URL da imagem ou selecione da galeria"
+          categoria="personagens"
+        />
+      </div>
         
         <div>
           <label>Valor em Kyros: </label>

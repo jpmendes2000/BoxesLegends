@@ -1,6 +1,7 @@
 // pages/Admin/Cadastro_local.jsx
 import { useState } from 'react';
 import { supabase } from './supabase';
+import InputComGaleria from '../../components/InputComGaleria';
 
 export default function CadastroLocal() {
   const [formData, setFormData] = useState({
@@ -97,15 +98,16 @@ export default function CadastroLocal() {
           />
         </div>
         
-        <div>
-          <label>Foto (URL): </label>
-          <input
-            type="text"
-            name="foto"
+        <div className="form-group">
+          <label>Foto (URL): </label> 
+          <InputComGaleria
             value={formData.foto}
-            onChange={handleChange}
+            onChange={(url) => setFormData(prev => ({ ...prev, foto: url }))}
+            placeholder="URL da imagem ou selecione da galeria"
+            categoria="locais"
           />
         </div>
+
         
         <button type="submit" disabled={loading}>
           {loading ? 'Cadastrando...' : 'Cadastrar Local'}

@@ -339,12 +339,10 @@ export default function ViewLocaisPersonagens() {
               
               <div className="form-group">
                 <label htmlFor="editFoto" className="form-label">Foto URL:</label>
-                <input 
-                  type="text" 
-                  id="editFoto" 
-                  className="form-control" 
-                  value={editingPersonagem.foto || ''}
-                  onChange={(e) => atualizarCampoPersonagem('foto', e.target.value)}
+                <InputComGaleria
+                  value={editingPersonagem?.foto || ''}
+                  onChange={(url) => atualizarCampoPersonagem('foto', url)}
+                  categoria="personagens"
                 />
               </div>
               

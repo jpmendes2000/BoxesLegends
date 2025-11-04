@@ -1,6 +1,7 @@
 // pages/Admin/Cadastro_admin.jsx
 import { useState } from 'react';
 import { criarUsuarioTeste } from './supabase';
+import InputComGaleria from '../../components/InputComGaleria';
 
 export default function CadastroAdmin() {
   const [formData, setFormData] = useState({
@@ -110,15 +111,15 @@ export default function CadastroAdmin() {
           </select>
         </div>
         
-        <div>
-          <label>Foto de Perfil (URL): </label>
-          <input
-            type="text"
-            name="foto_perfil"
-            value={formData.foto_perfil}
-            onChange={handleChange}
-          />
-        </div>
+      <div className="form-group">
+        <label>Foto de Perfil: </label>
+        <InputComGaleria
+          value={formData.foto_perfil}
+          onChange={(url) => setFormData(prev => ({ ...prev, foto_perfil: url }))}
+          placeholder="URL da imagem de perfil ou selecione da galeria"
+          categoria="perfis"
+        />
+      </div>
         
         <div>
           <label>Descrição do Perfil: </label>

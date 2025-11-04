@@ -1,6 +1,7 @@
 // src/pages/Login.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { fazerLogin } from './Admin/supabase';
 
 function Login() {
   const navigate = useNavigate();
@@ -41,29 +42,22 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3001/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          senha: formData.password
-        })
-      });
+      // Usa a função do Supabase
+      const resultado = await fazerLogin(
+        formData.email, 
+        formData.password, 
+        'S3nh@MestreSuperSecreta!'
+      );
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Salva dados do usuário no localStorage
-        localStorage.setItem('usuario', JSON.stringify(data.usuario));
-        
-        alert(`Bem-vindo de volta, ${data.usuario.nome}!`);
-        navigate('/');
-      } else {
-        alert(data.message || 'Erro ao fazer login');
-      }
+      // Salva dados do usuário no localStorage
+      localStorage.setItem('usuario', JSON.stringify(resultado.usuario));
+      localStorage.setItem('token', resultado.token);
+      
+      alert(`Bem-vindo de volta, ${resultado.usuario.nome}!`);
+      navigate('/');
     } catch (error) {
       console.error('Erro ao fazer login:', error);
-      alert('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+      alert(error.message || 'Erro ao fazer login');
     } finally {
       setLoading(false);
     }

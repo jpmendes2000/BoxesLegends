@@ -1,8 +1,7 @@
-// ========================================
-// FRONTEND - src/pages/Cadastro.jsx
-// ========================================
+// src/pages/Cadastro.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { cadastrarUsuario } from './Admin/supabase';
 
 function Cadastro() {
   const navigate = useNavigate();
@@ -91,29 +90,28 @@ function Cadastro() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3001/cadastro", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json" 
-        },
-        body: JSON.stringify({
+      // Usa a função do Supabase
+      const resultado = await cadastrarUsuario(
+        {
           nome: formData.username,
           email: formData.email,
           senha: formData.password,
-        }),
-      });
+          genero: 'prefiro não informar',
+          kyros: 0,
+          status: 'user'
+        },
+        'S3nh@MestreSuperSecreta!'
+      );
 
-      const data = await response.json();
+      // Salva dados do usuário no localStorage
+      localStorage.setItem('usuario', JSON.stringify(resultado.usuario));
+      localStorage.setItem('token', resultado.token);
 
-      if (response.ok) {
-        alert(`Bem-vindo, ${formData.username}! Conta criada com sucesso!`);
-        navigate('/login');
-      } else {
-        alert(data.erro || 'Erro ao criar conta');
-      }
+      alert(`Bem-vindo, ${formData.username}! Conta criada com sucesso!`);
+      navigate('/');
     } catch (error) {
       console.error('Erro ao cadastrar:', error);
-      alert('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+      alert(error.message || 'Erro ao criar conta');
     } finally {
       setLoading(false);
     }
