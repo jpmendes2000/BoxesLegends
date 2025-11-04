@@ -1,6 +1,6 @@
 // pages/Admin/Cadastro_person.jsx
 import { useState, useEffect } from 'react';
-import { supabase } from './supabase';
+import { supabase } from '../../supabase';
 import InputComGaleria from '../../components/InputComGaleria';
 
 export default function CadastroPersonagem() {

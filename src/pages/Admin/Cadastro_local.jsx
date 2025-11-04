@@ -1,6 +1,6 @@
 // pages/Admin/Cadastro_local.jsx
 import { useState } from 'react';
-import { supabase } from './supabase';
+import { supabase } from '../../supabase';
 import InputComGaleria from '../../components/InputComGaleria';
 
 export default function CadastroLocal() {

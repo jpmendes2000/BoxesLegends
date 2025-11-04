@@ -1,6 +1,6 @@
 // pages/Admin/Cadastro_admin.jsx
 import { useState } from 'react';
-import { criarUsuarioTeste } from './supabase';
+import { criarUsuarioTeste } from '../../supabase';
 import InputComGaleria from '../../components/InputComGaleria';
 
 export default function CadastroAdmin() {

@@ -1,7 +1,8 @@
 // src/pages/Login.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { fazerLogin } from './Admin/supabase';
+import { fazerLogin } from '../supabase';
+
 
 function Login() {
   const navigate = useNavigate();

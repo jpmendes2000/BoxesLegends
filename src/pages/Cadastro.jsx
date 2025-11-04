@@ -1,7 +1,7 @@
 // src/pages/Cadastro.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { cadastrarUsuario } from './Admin/supabase';
+import { cadastrarUsuario } from "../supabase";
 
 function Cadastro() {
   const navigate = useNavigate();

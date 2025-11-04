@@ -1,6 +1,7 @@
 // pages/Admin/View.jsx
 import { useState, useEffect } from 'react';
-import { supabase } from './supabase';
+import { supabase } from '../../supabase';
+import InputComGaleria from '../../components/InputComGaleria';
 
 export default function ViewLocaisPersonagens() {
   const [locais, setLocais] = useState([]);
