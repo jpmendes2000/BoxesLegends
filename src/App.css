@@ -1,0 +1,28 @@
+.app-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #01082b 20%, #c257cc 50%, #7108da 70%);
+}
+
+.error-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+  height: 100vh;
+  color: white;
+  text-align: center;
+}
+
+.error-page h2 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+#Título {
+  color: #fcc0e0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  text-align: center;
+  padding-top: 45px;
+}
+
+
