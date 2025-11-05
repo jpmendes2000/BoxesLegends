@@ -1,6 +1,6 @@
 // src/components/ModalGaleria.jsx
 import { useState, useEffect } from 'react';
-import { useGaleria } from '../context/GaleriaContext';
+import { useGaleria } from './GaleriaContext';
 
 const ModalGaleria = ({ isOpen, onClose, onSelectImagem, categoria = null }) => {
   const { galeria, loading, categorias, carregarGaleria, uploadImagem, adicionarImagem } = useGaleria();
