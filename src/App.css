@@ -10,6 +10,54 @@
   margin-left: var(--sidebar-width); /* ← ISSO É CRUCIAL! */
   min-height: 100vh;
   background: #0a0a0a;
+  transition: margin-left 0.3s ease;
+}
+
+/* ===== BOTÃO HAMBURGER ===== */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1100;
+  background: var(--accent);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.menu-toggle:hover {
+  background: #00a5bb;
+  transform: scale(1.05);
+}
+
+.menu-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #0b0b0b;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+/* Animação do hamburger quando aberto */
+.menu-open .menu-toggle span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.menu-open .menu-toggle span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-open .menu-toggle span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
 }
 
 /* ===== SIDEBAR ===== */
@@ -28,6 +76,7 @@
   border-right: 2px solid rgba(255,255,255,0.03);
   z-index: 1000;
   overflow-y: auto;
+  transition: transform 0.3s ease;
 }
 
 /* logo no topo */
@@ -114,6 +163,18 @@
 .container-superior-menu li:last-child a {
   margin-top: 6px;
   border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* ===== OVERLAY PARA MOBILE ===== */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
 }
 
 /* ===== POPUP ===== */
@@ -208,11 +269,11 @@
 /* ===== RESPONSIVO ===== */
 @media (max-width: 900px){
   :root{ 
-    --sidebar-width: 200px; 
+    --sidebar-width: 300px; 
   }
   
   .app-container {
-    margin-left: var(--sidebar-width);
+    margin-left: 0;
   }
   
   .logo img { 
@@ -223,33 +284,112 @@
   .welcome-section h1 {
     font-size: 1.8rem;
   }
+  
+  /* Mostra o botão hamburger */
+  .menu-toggle {
+    display: flex;
+  }
+  
+  /* Sidebar escondida por padrão no mobile */
+  .container-superior-menu {
+    transform: translateX(-100%);
+  }
+  
+  /* Sidebar visível quando menu aberto */
+  .container-superior-menu.menu-open {
+    transform: translateX(0);
+  }
+  
+  /* Mostra overlay quando menu aberto */
+  .menu-open + .menu-overlay {
+    display: block;
+  }
+  
+  .app-container.menu-open {
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 600px){
   :root{ 
-    --sidebar-width: 80px; 
-  }
-  
-  .app-container {
-    margin-left: var(--sidebar-width);
+    --sidebar-width: 280px; 
   }
   
   .container-superior-menu a {
-    font-size: 0.8rem;
-    padding: 8px 5px;
+    font-size: 0.9rem;
+    padding: 12px 10px;
   }
   
-  /* No mobile muito pequeno, esconde o texto e mostra apenas ícones */
+  /* No mobile, mostra texto e ícone */
   .nav-link-text {
-    display: none;
+    display: block;
   }
   
   .nav-link-with-icon {
-    justify-content: center;
+    justify-content: flex-start;
   }
   
   .nav-link-with-icon svg {
-    margin-right: 0;
-    font-size: 1.3em;
+    margin-right: 12px;
+    font-size: 1.2em;
+  }
+  
+  .menu-toggle {
+    top: 15px;
+    left: 15px;
+    width: 35px;
+    height: 35px;
+  }
+  
+  .menu-toggle span {
+    width: 18px;
+  }
+}
+
+/* ===== BANNER ROTATIVO ===== */
+.banner-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.banner-img {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Tablets */
+@media (max-width: 900px) {
+  .banner-container {
+    max-width: 800px;
+    padding: 15px;
+  }
+  
+  .banner-img {
+    max-height: 300px;
+  }
+}
+
+/* Mobile - remove o banner */
+@media (max-width: 768px) {
+  .banner-container {
+    display: none;
+  }
+}
+
+/* Desktop grande */
+@media (min-width: 1200px) {
+  .banner-container {
+    max-width: 1400px;
+  }
+  
+  .banner-img {
+    max-height: 450px;
   }
 }
