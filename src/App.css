@@ -67,17 +67,34 @@
 .container-superior-menu li {
   width: 100%;
 }
+
+/* ESTILOS ATUALIZADOS PARA ÍCONE À ESQUERDA E TEXTO CENTRALIZADO */
 .container-superior-menu a {
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
   padding: 12px 10px;
   color: var(--text);
   text-decoration: none;
-  text-align: center;
   font-weight: 500;
   border-radius: 10px;
   transition: transform .12s ease, background-color .12s ease;
   box-sizing: border-box;
+  position: relative;
+}
+
+/* Container para o texto que ficará centralizado */
+.nav-link-text {
+  flex: 1;
+  text-align: center;
+  margin-right: 24px; /* Compensa a largura do ícone */
+}
+
+/* Ícone na extrema esquerda */
+.nav-link-with-icon svg {
+  font-size: 1.1em;
+  flex-shrink: 0;
+  margin-right: 8px;
 }
 
 /* efeito hover */
@@ -220,5 +237,19 @@
   .container-superior-menu a {
     font-size: 0.8rem;
     padding: 8px 5px;
+  }
+  
+  /* No mobile muito pequeno, esconde o texto e mostra apenas ícones */
+  .nav-link-text {
+    display: none;
+  }
+  
+  .nav-link-with-icon {
+    justify-content: center;
+  }
+  
+  .nav-link-with-icon svg {
+    margin-right: 0;
+    font-size: 1.3em;
   }
 }

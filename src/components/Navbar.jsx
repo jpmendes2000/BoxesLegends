@@ -3,6 +3,22 @@ import { useState } from 'react';
 import logoImage from '../assets/logo-bx-legends.png';
 import { useAuth } from '../components/AuthContext';
 
+// Importando ícones (você pode precisar instalar react-icons: npm install react-icons)
+import { 
+  FaHome, 
+  FaUserShield, 
+  FaUser, 
+  FaMapMarkerAlt, 
+  FaEye, 
+  FaBox, 
+  FaTrophy, 
+  FaBook, 
+  FaStore, 
+  FaUserCircle,
+  FaSignInAlt,
+  FaSignOutAlt
+} from 'react-icons/fa';
+
 function Navbar() {
   const { user, logout } = useAuth();
   const [showPopup, setShowPopup] = useState(false);
@@ -18,19 +34,19 @@ function Navbar() {
   // Verifica se o usuário é admin
   const isAdmin = user && user.status === 'admin';
 
-  // Define todos os itens do menu
+  // Define todos os itens do menu com seus ícones
   const allItems = [
-    { path: '/', label: 'Home', requiresLogin: false, requiresAdmin: false },
-    { path: '/cadastro_de_adiministrador', label: 'Admin', requiresLogin: true, requiresAdmin: true },
-    { path: '/cadastro_de_personagens', label: 'Person', requiresLogin: true, requiresAdmin: true },
-    { path: '/cadastro_de_local', label: 'Local', requiresLogin: true, requiresAdmin: true },
-    { path: '/View_table_local_and_persons', label: 'View', requiresLogin: true, requiresAdmin: true },
-    { path: '/boxes', label: 'Boxes', requiresLogin: true, requiresAdmin: false },
-    { path: '/ranking', label: 'Ranking', requiresLogin: true, requiresAdmin: false },
-    { path: '/biblioteca', label: 'Biblioteca', requiresLogin: true, requiresAdmin: false },
-    { path: '/marketplace', label: 'Marketplace', requiresLogin: true, requiresAdmin: false },
-    { path: '/usuario', label: 'Usuário', requiresLogin: true, requiresAdmin: false },
-    { path: '/login', label: user ? `Sair (${user.nome || user.name})` : 'Login', requiresLogin: false, requiresAdmin: false },
+    { path: '/', label: 'Home', icon: <FaHome />, requiresLogin: false, requiresAdmin: false },
+    { path: '/cadastro_de_adiministrador', label: 'Admin', icon: <FaUserShield />, requiresLogin: true, requiresAdmin: true },
+    { path: '/cadastro_de_personagens', label: 'Person', icon: <FaUser />, requiresLogin: true, requiresAdmin: true },
+    { path: '/cadastro_de_local', label: 'Local', icon: <FaMapMarkerAlt />, requiresLogin: true, requiresAdmin: true },
+    { path: '/View_table_local_and_persons', label: 'View', icon: <FaEye />, requiresLogin: true, requiresAdmin: true },
+    { path: '/boxes', label: 'Boxes', icon: <FaBox />, requiresLogin: true, requiresAdmin: false },
+    { path: '/ranking', label: 'Ranking', icon: <FaTrophy />, requiresLogin: true, requiresAdmin: false },
+    { path: '/biblioteca', label: 'Biblioteca', icon: <FaBook />, requiresLogin: true, requiresAdmin: false },
+    { path: '/marketplace', label: 'Marketplace', icon: <FaStore />, requiresLogin: true, requiresAdmin: false },
+    { path: '/usuario', label: 'Usuário', icon: <FaUserCircle />, requiresLogin: true, requiresAdmin: false },
+    { path: '/login', label: user ? `Sair (${user.nome || user.name})` : 'Login', icon: user ? <FaSignOutAlt /> : <FaSignInAlt />, requiresLogin: false, requiresAdmin: false },
   ];
 
   // Filtra os itens: mostra tudo se for admin, senão só os que não exigem admin
@@ -108,17 +124,22 @@ function Navbar() {
                 <a
                   href="#!"
                   onClick={handleLoginLogout}
+                  className="nav-link-with-icon"
                 >
-                  {item.label}
+                  {item.icon}
+                  <span className="nav-link-text">{item.label}</span>
                 </a>
               ) : (
                 <NavLink
                   to={item.path}
                   end={item.path === '/'}
                   onClick={(e) => handleNavClick(e, item)}
-                  className={({ isActive }) => (isActive ? 'active' : '')}
+                  className={({ isActive }) => 
+                    `nav-link-with-icon ${isActive ? 'active' : ''}`
+                  }
                 >
-                  {item.label}
+                  {item.icon}
+                  <span className="nav-link-text">{item.label}</span>
                 </NavLink>
               )}
             </li>
