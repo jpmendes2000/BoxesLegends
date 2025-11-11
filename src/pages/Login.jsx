@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fazerLogin } from '../supabase';
+import Navbar from '../components/Navbar';
 
 
 function Login() {
@@ -66,6 +67,7 @@ function Login() {
 
   return (
     <div className="login-container">
+        <Navbar />
       {/* Botão fixo no canto superior esquerdo */}
       <button 
         className="back-btn-fixed" 

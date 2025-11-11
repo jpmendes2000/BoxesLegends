@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { cadastrarUsuario } from "../supabase";
+import Navbar from '../components/Navbar';
 
 function Cadastro() {
   const navigate = useNavigate();
@@ -119,6 +120,7 @@ function Cadastro() {
 
   return (
     <div className="login-container">
+      <Navbar />
       <div className="login-left">
         <button 
           type="button" 
