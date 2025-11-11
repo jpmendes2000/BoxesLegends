@@ -1,28 +1,134 @@
-.app-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #01082b 20%, #c257cc 50%, #7108da 70%);
+:root{
+  --sidebar-width: 370px; /* aumenta aqui se quiser maior */
+  --sidebar-bg: #111214;
+  --accent: #00bcd4;
+  --text: #e6e6e6;
 }
 
-.error-page {
+.container-superior-menu {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background-color: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 12px;
+  box-sizing: border-box;
+  border-right: 2px solid rgba(255,255,255,0.03);
+  z-index: 1000;
+}
+
+/* logo no topo */
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.logo img {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent);
+}
+
+/* área vazia / conteúdo do topo (se quiser algo mais) */
+.top-spacer {
+  height: 18px;
+}
+
+/* lista ocupa o espaço restante, mas com itens empurrados pro fim */
+.container-superior-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* garante que a lista fique embaixo */
+  margin-top: auto;
+  gap: 8px;
+  padding-bottom: 18px;
+}
+
+/* cada item ocupa toda largura e fica "botão" */
+.container-superior-menu li {
+  width: 100%;
+}
+.container-superior-menu a {
+  display: block;
+  width: 100%;
+  padding: 12px 10px;
+  color: var(--text);
+  text-decoration: none;
+  text-align: center;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: transform .12s ease, background-color .12s ease;
+  box-sizing: border-box;
+}
+
+/* efeito ao pairar */
+.container-superior-menu a:hover {
+  background-color: rgba(0,188,212,0.12);
+  transform: translateX(4px);
+}
+
+/* quando ativo (NavLink) */
+.container-superior-menu a.active {
+  background-color: var(--accent);
+  color: #0b0b0b;
+  font-weight: 700;
+}
+
+/* botão de login separado (último) — opcional */
+.container-superior-menu li:last-child a {
+  margin-top: 6px;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* popup (mesmo do exemplo anterior) */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
   display: flex;
   justify-content: center;
-  align-items: center;  
-  height: 100vh;
-  color: white;
+  align-items: center;
+  z-index: 2000;
+}
+
+.popup {
+  background: #161616;
+  padding: 26px;
+  border-radius: 12px;
   text-align: center;
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  min-width: 280px;
 }
 
-.error-page h2 {
-  font-size: 2rem;
-  margin: 0;
+.popup button {
+  margin-top: 14px;
+  background: var(--accent);
+  border: none;
+  color: #0b0b0b;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
 }
+.popup button:hover { filter: brightness(1.06) }
 
-#Título {
-  color: #fcc0e0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  cursor: default;
-  text-align: center;
-  padding-top: 45px;
+/* responsividade: em telas pequenas faz a sidebar menor */
+@media (max-width: 900px){
+  :root{ --sidebar-width: 200px; }
+  .logo img { width:72px; height:72px; }
 }
-
-
