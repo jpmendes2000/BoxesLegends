@@ -1,10 +1,18 @@
 :root{
-  --sidebar-width: 370px; /* aumenta aqui se quiser maior */
+  --sidebar-width: 400px;
   --sidebar-bg: #111214;
   --accent: #00bcd4;
   --text: #e6e6e6;
 }
 
+/* ===== CONTAINER PRINCIPAL ===== */
+.app-container {
+  margin-left: var(--sidebar-width); /* ← ISSO É CRUCIAL! */
+  min-height: 100vh;
+  background: #0a0a0a;
+}
+
+/* ===== SIDEBAR ===== */
 .container-superior-menu {
   position: fixed;
   left: 0;
@@ -19,6 +27,7 @@
   box-sizing: border-box;
   border-right: 2px solid rgba(255,255,255,0.03);
   z-index: 1000;
+  overflow-y: auto;
 }
 
 /* logo no topo */
@@ -36,12 +45,12 @@
   border: 2px solid var(--accent);
 }
 
-/* área vazia / conteúdo do topo (se quiser algo mais) */
+/* área vazia / conteúdo do topo */
 .top-spacer {
   height: 18px;
 }
 
-/* lista ocupa o espaço restante, mas com itens empurrados pro fim */
+/* lista ocupa o espaço restante */
 .container-superior-menu ul {
   list-style: none;
   padding: 0;
@@ -49,13 +58,12 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  /* garante que a lista fique embaixo */
   margin-top: auto;
   gap: 8px;
   padding-bottom: 18px;
 }
 
-/* cada item ocupa toda largura e fica "botão" */
+/* cada item */
 .container-superior-menu li {
   width: 100%;
 }
@@ -72,26 +80,26 @@
   box-sizing: border-box;
 }
 
-/* efeito ao pairar */
+/* efeito hover */
 .container-superior-menu a:hover {
   background-color: rgba(0,188,212,0.12);
   transform: translateX(4px);
 }
 
-/* quando ativo (NavLink) */
+/* quando ativo */
 .container-superior-menu a.active {
   background-color: var(--accent);
   color: #0b0b0b;
   font-weight: 700;
 }
 
-/* botão de login separado (último) — opcional */
+/* botão de login */
 .container-superior-menu li:last-child a {
   margin-top: 6px;
   border: 1px solid rgba(255,255,255,0.03);
 }
 
-/* popup (mesmo do exemplo anterior) */
+/* ===== POPUP ===== */
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -125,10 +133,92 @@
   cursor: pointer;
   font-weight: 600;
 }
-.popup button:hover { filter: brightness(1.06) }
+.popup button:hover { 
+  filter: brightness(1.06);
+}
 
-/* responsividade: em telas pequenas faz a sidebar menor */
+/* ===== CONTEÚDO HOME ===== */
+.home-content {
+  padding: 20px;
+  color: #fff;
+}
+
+.home-main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.welcome-section h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: var(--accent);
+}
+
+.welcome-section .apresentation {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--text);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background: var(--sidebar-bg);
+  padding: 20px;
+  text-align: center;
+  color: var(--text);
+  border-top: 2px solid rgba(255,255,255,0.03);
+  margin-top: 60px;
+}
+
+/* ===== 404 ===== */
+.error-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+/* ===== RESPONSIVO ===== */
 @media (max-width: 900px){
-  :root{ --sidebar-width: 200px; }
-  .logo img { width:72px; height:72px; }
+  :root{ 
+    --sidebar-width: 200px; 
+  }
+  
+  .app-container {
+    margin-left: var(--sidebar-width);
+  }
+  
+  .logo img { 
+    width:72px; 
+    height:72px; 
+  }
+  
+  .welcome-section h1 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 600px){
+  :root{ 
+    --sidebar-width: 80px; 
+  }
+  
+  .app-container {
+    margin-left: var(--sidebar-width);
+  }
+  
+  .container-superior-menu a {
+    font-size: 0.8rem;
+    padding: 8px 5px;
+  }
 }
