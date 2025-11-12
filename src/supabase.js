@@ -134,6 +134,38 @@ export async function fazerLogin(email, senha, masterPass) {
   }
 }
 
+export const loginComGoogle = async () => {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
+    })
+
+    if (error) throw error
+    return data
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
+export const loginComGitHub = async () => {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
+    })
+
+    if (error) throw error
+    return data
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
 /**
  * Função de cadastro de usuário normal
  */
