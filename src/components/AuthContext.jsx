@@ -1,67 +1,62 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { fazerLogin } from '../supabase';
+// AuthContext.jsx
+import { useState, useEffect, createContext, useContext } from 'react';
+import { supabase } from '../supabase';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);      // usuário (objeto vindo do supabase)
-  const [token, setToken] = useState(null);    // token simulado do teu fazerLogin
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ao carregar, tenta recuperar do localStorage
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('auth');
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        setUser(parsed.user || null);
-        setToken(parsed.token || null);
+    // Verificar sessão ao carregar
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setUser(session.user);
       }
-    } catch (err) {
-      console.error('Erro ao ler auth do localStorage', err);
-    } finally {
       setLoading(false);
-    }
+    });
+
+    // Ouvir mudanças de autenticação
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  // salva no localStorage quando user/token mudam
-  useEffect(() => {
-    if (user || token) {
-      localStorage.setItem('auth', JSON.stringify({ user, token }));
-    } else {
-      localStorage.removeItem('auth');
-    }
-  }, [user, token]);
-
-  // função que faz login usando a tua função do supabase.js
-  // masterPass é lido da env (REACT_APP_MASTER_PASS) por segurança
-  async function login(email, senha) {
+  const login = async (email, password) => {
     try {
-      const masterPass = process.env.REACT_APP_MASTER_PASS || ''; 
-      const res = await fazerLogin(email, senha, masterPass);
-      // res: { usuario: { ... }, token: '...' }
-      setUser(res.usuario);
-      setToken(res.token);
-      return { ok: true };
-    } catch (err) {
-      console.error('Erro no login (AuthProvider):', err);
-      return { ok: false, error: err.message || String(err) };
-    }
-  }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-  function logout() {
-    setUser(null);
-    setToken(null);
-    // se tiver rotinas de logout no supabase, roda aqui também
-  }
+      if (error) throw error;
+      return { ok: true, user: data.user };
+    } catch (error) {
+      return { ok: false, error: error.message };
+    }
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+  };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, setUser }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+  }
+  return context;
+};
