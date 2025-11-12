@@ -181,7 +181,7 @@ function Login() {
             <div className="input-border"></div>
           </div>
 
-          <Link to="/resetar-senha" className="forgot-link">
+          <Link to="/recuperar_senha" className="forgot-link">
             Esqueci minha senha
           </Link>
 

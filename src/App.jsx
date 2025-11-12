@@ -15,6 +15,7 @@ import Marketplace from './pages/Marketplace';
 import Usuario from './pages/Usuario';
 import Login from './pages/Login';
 import Cadastro from './pages/Cadastro';
+//import Recover from './pages/ResetarSenha'
 import Cadastro_admin from './pages/Admin/Cadastro_admin';
 import Cadastro_person from './pages/Admin/Cadastro_person';
 import Cadastro_local from './pages/Admin/Cadastro_local';
