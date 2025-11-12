@@ -1,11 +1,12 @@
-// src/pages/Login.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fazerLogin, loginComGoogle, loginComGitHub } from '../supabase';
+import { useAuth } from '../components/AuthContext';
 import Navbar from '../components/Navbar';
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -44,13 +45,15 @@ function Login() {
     setLoading(true);
 
     try {
-      const resultado = await fazerLogin(formData.email, formData.password);
+      // Usa a função de login do contexto
+      const resultado = await login(formData.email, formData.password);
       
-      localStorage.setItem('usuario', JSON.stringify(resultado.usuario));
-      localStorage.setItem('token', resultado.token);
-      
-      alert(`Bem-vindo de volta!`);
-      navigate('/');
+      if (resultado.ok) {
+        alert('Login realizado com sucesso!');
+        navigate('/');
+      } else {
+        alert(resultado.error || 'Erro ao fazer login');
+      }
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       alert(error.message || 'Erro ao fazer login');
@@ -65,12 +68,14 @@ function Login() {
     try {
       if (provider === 'google') {
         await loginComGoogle();
+        // O redirecionamento é automático pelo Supabase
       } else if (provider === 'github') {
         await loginComGitHub();
+        // O redirecionamento é automático pelo Supabase
       }
     } catch (error) {
       console.error(`Erro no login com ${provider}:`, error);
-      alert(`Erro ao fazer login com ${provider}`);
+      alert(`Erro ao fazer login com ${provider}. Verifique se o OAuth está configurado no Supabase.`);
       setSocialLoading(null);
     }
   };
@@ -96,7 +101,7 @@ function Login() {
           <button 
             className="social-btn google-btn"
             onClick={() => handleSocialLogin('google')}
-            disabled={socialLoading}
+            disabled={socialLoading !== null}
           >
             {socialLoading === 'google' ? (
               <div className="social-loading"></div>
@@ -116,7 +121,7 @@ function Login() {
           <button 
             className="social-btn github-btn"
             onClick={() => handleSocialLogin('github')}
-            disabled={socialLoading}
+            disabled={socialLoading !== null}
           >
             {socialLoading === 'github' ? (
               <div className="social-loading"></div>
