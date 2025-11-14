@@ -1,6 +1,7 @@
 // pages/Admin/View.jsx
 import { useState, useEffect } from 'react';
 import { supabase } from '../../supabase';
+import Navbar from '../../components/Navbar';
 import InputComGaleria from '../../components/InputComGaleria';
 
 export default function ViewLocaisPersonagens() {
@@ -159,6 +160,7 @@ export default function ViewLocaisPersonagens() {
 
   return (
     <div>
+      <Navbar />
       <div className="decoration decoration-1"></div>
       <div className="decoration decoration-2"></div>
       

@@ -1,6 +1,7 @@
 // src/pages/Usuario.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 function Usuario() {
   const navigate = useNavigate();
@@ -144,6 +145,7 @@ function Usuario() {
 
   return (
     <div className="login-container">
+      <Navbar />
       <button className="back-btn-fixed" onClick={() => navigate('/')}>
         ← Voltar pra Home
       </button>

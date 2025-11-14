@@ -1,6 +1,7 @@
 // pages/Admin/Cadastro_person.jsx
 import { useState, useEffect } from 'react';
 import { supabase } from '../../supabase';
+import Navbar from '../../components/Navbar';
 import InputComGaleria from '../../components/InputComGaleria';
 
 export default function CadastroPersonagem() {
@@ -100,6 +101,7 @@ export default function CadastroPersonagem() {
 
   return (
     <div>
+      <Navbar />
       <h1>Cadastrar Personagem</h1>
       <form onSubmit={handleSubmit}>
         <div>

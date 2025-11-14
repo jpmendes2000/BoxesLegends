@@ -1,6 +1,7 @@
 // pages/Admin/Cadastro_admin.jsx
 import { useState } from 'react';
 import { criarUsuarioTeste } from '../../supabase';
+import Navbar from '../../components/Navbar';
 import InputComGaleria from '../../components/InputComGaleria';
 
 export default function CadastroAdmin() {
@@ -62,6 +63,7 @@ export default function CadastroAdmin() {
 
   return (
     <div>
+      <Navbar />
       <h1>Cadastrar Admin</h1>
       <form onSubmit={handleSubmit}>
         <div>

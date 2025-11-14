@@ -1,6 +1,6 @@
 // AuthContext.jsx
 import { useState, useEffect, createContext, useContext } from 'react';
-import { supabase } from '../supabase';
+import { supabase, decryptEmail } from '../supabase';
 
 const AuthContext = createContext();
 
@@ -9,19 +9,88 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar sessão ao carregar
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setUser(session.user);
+    // Função para carregar usuário do localStorage ou Supabase
+    const loadUser = async () => {
+      try {
+        // 1. Primeiro, verifica se há sessão OAuth no Supabase
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          // Login OAuth (Google/GitHub)
+          const oauthUser = {
+            id: session.user.id,
+            email: session.user.email,
+            nome: session.user.user_metadata?.full_name || session.user.email?.split('@')[0],
+            foto_perfil: session.user.user_metadata?.avatar_url || null,
+            status: 'user', // OAuth users são 'user' por padrão
+            tipo_login: 'oauth'
+          };
+          setUser(oauthUser);
+          localStorage.setItem('user', JSON.stringify(oauthUser));
+        } else {
+          // 2. Se não há sessão OAuth, verifica localStorage (login tradicional)
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            try {
+              const parsedUser = JSON.parse(storedUser);
+              // Descriptografa o email se necessário
+              if (parsedUser.email && !parsedUser.email.includes('@')) {
+                parsedUser.email = decryptEmail(parsedUser.email) || parsedUser.email;
+              }
+              setUser(parsedUser);
+            } catch (err) {
+              console.error('Erro ao carregar usuário do localStorage:', err);
+              localStorage.removeItem('user');
+              localStorage.removeItem('token');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar usuário:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
 
-    // Ouvir mudanças de autenticação
+    loadUser();
+
+    // Ouvir mudanças de autenticação OAuth
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        const oauthUser = {
+          id: session.user.id,
+          email: session.user.email,
+          nome: session.user.user_metadata?.full_name || session.user.email?.split('@')[0],
+          foto_perfil: session.user.user_metadata?.avatar_url || null,
+          status: 'user',
+          tipo_login: 'oauth'
+        };
+        setUser(oauthUser);
+        localStorage.setItem('user', JSON.stringify(oauthUser));
+      } else {
+        // Se a sessão OAuth foi encerrada, verifica se há usuário tradicional
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          try {
+            const parsedUser = JSON.parse(storedUser);
+            if (parsedUser.tipo_login !== 'oauth') {
+              setUser(parsedUser);
+            } else {
+              setUser(null);
+              localStorage.removeItem('user');
+              localStorage.removeItem('token');
+            }
+          } catch {
+            setUser(null);
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+          }
+        } else {
+          setUser(null);
+        }
+      }
       setLoading(false);
     });
 
@@ -43,7 +112,24 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    try {
+      // Limpa localStorage
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      
+      // Se for usuário OAuth, faz signOut no Supabase
+      if (user?.tipo_login === 'oauth') {
+        await supabase.auth.signOut();
+      }
+      
+      setUser(null);
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      // Mesmo com erro, limpa o estado local
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      setUser(null);
+    }
   };
 
   return (

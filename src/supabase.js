@@ -4,10 +4,12 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = 'https://nsdsixizbaehfzeddbzc.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zZHNpeGl6YmFlaGZ6ZWRkYnpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxODg5NzEsImV4cCI6MjA3Nzc2NDk3MX0.MdIU1Py2r0YSuySAooy9V4V_aMHlO69CXMfuJBqjda4';
 
-// Cria o cliente Supabase
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Função de hash simples
+// MASTER_PASS fixa para desenvolvimento (substitua em produção)
+const MASTER_PASS = 'minha_master_pass_dev_2025';
+
+// Função de hash (SHA-256)
 async function hashPassword(password) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
@@ -17,7 +19,7 @@ async function hashPassword(password) {
     .join('');
 }
 
-// Função simples de criptografia (apenas para teste)
+// Função simples de criptografia XOR + base64 (mantida)
 function simpleEncrypt(text, key) {
   let result = '';
   for (let i = 0; i < text.length; i++) {
@@ -27,10 +29,7 @@ function simpleEncrypt(text, key) {
   return btoa(result);
 }
 
-/**
- * Função para descriptografar email (se necessário)
- */
-export function decryptEmail(encryptedEmail, masterPass) {
+export function decryptEmail(encryptedEmail, masterPass = MASTER_PASS) {
   try {
     const decoded = atob(encryptedEmail);
     let result = '';
@@ -45,10 +44,7 @@ export function decryptEmail(encryptedEmail, masterPass) {
   }
 }
 
-/**
- * Prepara os dados do usuário para inserção
- */
-async function prepareUserPayload(user, masterPass) {
+async function prepareUserPayload(user, masterPass = MASTER_PASS) {
   return {
     nome: user.nome,
     email: simpleEncrypt(user.email, masterPass),
@@ -62,12 +58,9 @@ async function prepareUserPayload(user, masterPass) {
   };
 }
 
-/**
- * Cria um usuário no Supabase
- */
-export async function criarUsuarioTeste(user, masterPass) {
+export async function criarUsuarioTeste(user) {
   try {
-    const payload = await prepareUserPayload(user, masterPass);
+    const payload = await prepareUserPayload(user); // usa MASTER_PASS internamente
 
     const { data, error } = await supabase
       .from('usuarios')
@@ -87,18 +80,14 @@ export async function criarUsuarioTeste(user, masterPass) {
   }
 }
 
-/**
- * Função de login
- */
-export async function fazerLogin(email, senha, masterPass) {
+// fazerLogin agora usa MASTER_PASS internamente — não precisa passar pela UI
+export async function fazerLogin(email, senha) {
   try {
-    // Criptografa o email para buscar no banco
-    const emailCriptografado = simpleEncrypt(email, masterPass);
+    const emailCriptografado = simpleEncrypt(email, MASTER_PASS);
     const senhaHash = await hashPassword(senha);
 
     console.log('Buscando usuário com email criptografado...');
 
-    // Busca o usuário no banco
     const { data: usuarios, error } = await supabase
       .from('usuarios')
       .select('*')
@@ -115,18 +104,16 @@ export async function fazerLogin(email, senha, masterPass) {
 
     const usuario = usuarios[0];
 
-    // Verifica a senha
     if (usuario.senha !== senhaHash) {
       throw new Error('Email ou senha incorretos');
     }
 
     console.log('Login bem-sucedido:', usuario);
-    
-    // Retorna os dados do usuário (sem a senha)
+
     const { senha: _, ...usuarioSemSenha } = usuario;
     return {
       usuario: usuarioSemSenha,
-      token: 'token-simulado-' + Date.now() // Em produção, use JWT real
+      token: 'token-simulado-' + Date.now()
     };
   } catch (error) {
     console.error('Erro no login:', error);
@@ -134,7 +121,6 @@ export async function fazerLogin(email, senha, masterPass) {
   }
 }
 
-// supabase.js
 export const loginComGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -158,14 +144,11 @@ export const loginComGitHub = async () => {
   if (error) throw error;
   return data;
 };
-/**
- * Função de cadastro de usuário normal
- */
-export async function cadastrarUsuario(usuario, masterPass) {
-  try {
-    const payload = await prepareUserPayload(usuario, masterPass);
 
-    // Verifica se o usuário já existe
+export async function cadastrarUsuario(usuario) {
+  try {
+    const payload = await prepareUserPayload(usuario); // MASTER_PASS interno
+
     const { data: usuarioExistente, error: erroBusca } = await supabase
       .from('usuarios')
       .select('email')
@@ -179,7 +162,6 @@ export async function cadastrarUsuario(usuario, masterPass) {
       throw new Error('Já existe um usuário com este email');
     }
 
-    // Insere o novo usuário
     const { data, error } = await supabase
       .from('usuarios')
       .insert([payload])
@@ -190,11 +172,10 @@ export async function cadastrarUsuario(usuario, masterPass) {
     }
 
     console.log('Usuário cadastrado com sucesso:', data);
-    
-    // Retorna os dados sem a senha
+
     const usuarioCriado = data[0];
     const { senha: _, ...usuarioSemSenha } = usuarioCriado;
-    
+
     return {
       usuario: usuarioSemSenha,
       token: 'token-simulado-' + Date.now()

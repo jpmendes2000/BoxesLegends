@@ -4,7 +4,7 @@ import './pages/styles/style-global.css';
 import './pages/styles/login.css'
 
 import { GaleriaProvider } from './components/GaleriaContext';
-import { AuthProvider } from './components/AuthContext'; // ← ADICIONE ISSO
+import { AuthProvider } from './components/AuthContext';
 
 // Importando todas as páginas
 import Home from './pages/Home';
@@ -15,6 +15,7 @@ import Marketplace from './pages/Marketplace';
 import Usuario from './pages/Usuario';
 import Login from './pages/Login';
 import Cadastro from './pages/Cadastro';
+import AuthCallback from './components/AuthCallback'; // ← ADICIONAR
 //import Recover from './pages/ResetarSenha'
 import Cadastro_admin from './pages/Admin/Cadastro_admin';
 import Cadastro_person from './pages/Admin/Cadastro_person';
@@ -23,7 +24,7 @@ import View from './pages/Admin/View';
 
 function App() {  
   return (
-    <AuthProvider> {/* ← ENVOLVA COM AuthProvider */}
+    <AuthProvider>
       <GaleriaProvider>
         <Router>
           <div className="app-container">
@@ -36,6 +37,7 @@ function App() {
               <Route path="/usuario" element={<Usuario />} />
               <Route path="/login" element={<Login />} />
               <Route path="/cadastro" element={<Cadastro />} />
+              <Route path="/auth/callback" element={<AuthCallback />} /> 
               <Route path="/cadastro_de_adiministrador" element={<Cadastro_admin />}/>
               <Route path="/cadastro_de_personagens" element={<Cadastro_person />}/>
               <Route path="/cadastro_de_local" element={<Cadastro_local />}/>

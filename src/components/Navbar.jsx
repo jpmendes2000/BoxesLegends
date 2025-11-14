@@ -3,7 +3,7 @@ import { useState } from 'react';
 import logoImage from '../assets/logo-bx-legends.png';
 import { useAuth } from '../components/AuthContext';
 
-// Importando ícones (você pode precisar instalar react-icons: npm install react-icons)
+// Importando ícones
 import { 
   FaHome, 
   FaUserShield, 
@@ -21,15 +21,8 @@ import {
 
 function Navbar() {
   const { user, logout } = useAuth();
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupMessage, setPopupMessage] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-
-  const closePopup = () => {
-    setShowPopup(false);
-    setPopupMessage('');
-  };
 
   // Verifica se o usuário é admin
   const isAdmin = user && user.status === 'admin';
@@ -46,7 +39,6 @@ function Navbar() {
     { path: '/biblioteca', label: 'Biblioteca', icon: <FaBook />, requiresLogin: true, requiresAdmin: false },
     { path: '/marketplace', label: 'Marketplace', icon: <FaStore />, requiresLogin: true, requiresAdmin: false },
     { path: '/usuario', label: 'Usuário', icon: <FaUserCircle />, requiresLogin: true, requiresAdmin: false },
-    { path: '/login', label: user ? `Sair (${user.nome || user.name})` : 'Login', icon: user ? <FaSignOutAlt /> : <FaSignInAlt />, requiresLogin: false, requiresAdmin: false },
   ];
 
   // Filtra os itens: mostra tudo se for admin, senão só os que não exigem admin
@@ -58,27 +50,26 @@ function Navbar() {
   });
 
   const handleNavClick = (e, item) => {
-    // Se for o login, deixa passar
-    if (item.path === '/login') return;
-
     // Se for a home, deixa passar
-    if (item.path === '/') return;
+    if (item.path === '/') {
+      setMenuOpen(false);
+      return;
+    }
 
     // Se exige login e não está logado
     if (item.requiresLogin && !user) {
       e.preventDefault();
-      setPopupMessage('Você precisa fazer login para acessar essa página.');
-      setShowPopup(true);
-      setMenuOpen(false); // Fecha o menu mobile
+      alert('Você precisa fazer login para acessar essa página.');
+      navigate('/login');
+      setMenuOpen(false);
       return;
     }
 
     // Se exige admin e não é admin
     if (item.requiresAdmin && (!user || user.status !== 'admin')) {
       e.preventDefault();
-      setPopupMessage('Apenas administradores podem acessar esta página.');
-      setShowPopup(true);
-      setMenuOpen(false); // Fecha o menu mobile
+      alert('Apenas administradores podem acessar esta página.');
+      setMenuOpen(false);
       return;
     }
 
@@ -86,15 +77,16 @@ function Navbar() {
     setMenuOpen(false);
   };
 
-  const handleLoginLogout = (e) => {
+  const handleLoginLogout = async (e) => {
     e.preventDefault();
     if (user) {
-      logout();
+      await logout();
+      alert('Você saiu da sua conta!');
       navigate('/');
     } else {
       navigate('/login');
     }
-    setMenuOpen(false); // Fecha o menu mobile
+    setMenuOpen(false);
   };
 
   return (
@@ -120,30 +112,33 @@ function Navbar() {
         <ul>
           {visibleItems.map((item) => (
             <li key={item.path}>
-              {item.path === '/login' ? (
-                <a
-                  href="#!"
-                  onClick={handleLoginLogout}
-                  className="nav-link-with-icon"
-                >
-                  {item.icon}
-                  <span className="nav-link-text">{item.label}</span>
-                </a>
-              ) : (
-                <NavLink
-                  to={item.path}
-                  end={item.path === '/'}
-                  onClick={(e) => handleNavClick(e, item)}
-                  className={({ isActive }) => 
-                    `nav-link-with-icon ${isActive ? 'active' : ''}`
-                  }
-                >
-                  {item.icon}
-                  <span className="nav-link-text">{item.label}</span>
-                </NavLink>
-              )}
+              <NavLink
+                to={item.path}
+                end={item.path === '/'}
+                onClick={(e) => handleNavClick(e, item)}
+                className={({ isActive }) => 
+                  `nav-link-with-icon ${isActive ? 'active' : ''}`
+                }
+              >
+                {item.icon}
+                <span className="nav-link-text">{item.label}</span>
+              </NavLink>
             </li>
           ))}
+          
+          {/* Botão de Login/Logout - só aparece se não estiver logado OU para fazer logout */}
+          <li>
+            <a
+              href="#!"
+              onClick={handleLoginLogout}
+              className="nav-link-with-icon"
+            >
+              {user ? <FaSignOutAlt /> : <FaSignInAlt />}
+              <span className="nav-link-text">
+                {user ? `Sair (${user.nome || user.name})` : 'Login'}
+              </span>
+            </a>
+          </li>
         </ul>
       </nav>
 
@@ -153,38 +148,6 @@ function Navbar() {
           className="menu-overlay"
           onClick={() => setMenuOpen(false)}
         />
-      )}
-
-      {/* Popup de aviso */}
-      {showPopup && (
-        <div className="popup-overlay" onClick={closePopup}>
-          <div className="popup" onClick={(e) => e.stopPropagation()}>
-            <h2>⚠️ Atenção</h2>
-            <p>{popupMessage}</p>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => {
-                  closePopup();
-                  navigate('/login');
-                }}
-              >
-                Ir para login
-              </button>
-              <button
-                onClick={closePopup}
-                style={{
-                  background: 'transparent',
-                  color: '#fff',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  padding: '10px 14px',
-                  borderRadius: 8
-                }}
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </>
   );

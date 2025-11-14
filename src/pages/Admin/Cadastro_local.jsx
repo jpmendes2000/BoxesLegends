@@ -1,6 +1,7 @@
 // pages/Admin/Cadastro_local.jsx
 import { useState } from 'react';
 import { supabase } from '../../supabase';
+import Navbar from '../../components/Navbar';
 import InputComGaleria from '../../components/InputComGaleria';
 
 export default function CadastroLocal() {
@@ -59,6 +60,7 @@ export default function CadastroLocal() {
 
   return (
     <div>
+      <Navbar />
       <h1>Cadastrar Local (Desenho, Filme, Série, Jogo)</h1>
       <form onSubmit={handleSubmit}>
         <div>
