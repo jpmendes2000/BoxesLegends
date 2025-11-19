@@ -1,44 +1,48 @@
 // src/components/ModalGaleria.jsx
 import { useState, useEffect } from 'react';
-import { useGaleria } from './GaleriaContext';
+import { useGaleria } from '../components/GaleriaContext';
 
 const ModalGaleria = ({ isOpen, onClose, onSelectImagem, categoria = null }) => {
   const { galeria, loading, categorias, carregarGaleria, uploadImagem, adicionarImagem } = useGaleria();
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState(categoria || '');
+  const [categoriaAtual, setCategoriaAtual] = useState(categoria || 'perfis');
+  const [imagemSelecionada, setImagemSelecionada] = useState(null);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      carregarGaleria(categoriaSelecionada || null);
+      carregarGaleria(categoriaAtual);
     }
-  }, [isOpen, categoriaSelecionada]);
+  }, [isOpen, categoriaAtual, carregarGaleria]);
 
-  const handleUpload = async (event) => {
+  const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     // Verificar se é imagem
     if (!file.type.startsWith('image/')) {
-      alert('Por favor, selecione apenas arquivos de imagem');
-      return;
-    }
-
-    // Verificar tamanho (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('A imagem deve ter no máximo 5MB');
+      alert('Por favor, selecione apenas arquivos de imagem.');
       return;
     }
 
     setUploading(true);
     try {
-      const imagemUploaded = await uploadImagem(file, categoriaSelecionada || 'geral');
-      const imagemSalva = await adicionarImagem(imagemUploaded);
-      alert('Imagem adicionada com sucesso!');
+      const imagem = await uploadImagem(file, categoriaAtual);
+      const imagemSalva = await adicionarImagem(imagem);
+      
+      // Seleciona a imagem automaticamente após upload
+      setImagemSelecionada(imagemSalva.url);
     } catch (error) {
-      alert('Erro ao fazer upload da imagem');
+      console.error('Erro ao fazer upload:', error);
+      alert('Erro ao fazer upload da imagem.');
     } finally {
       setUploading(false);
       event.target.value = ''; // Reset input
+    }
+  };
+
+  const handleSelecionar = () => {
+    if (imagemSelecionada) {
+      onSelectImagem(imagemSelecionada);
     }
   };
 
@@ -48,72 +52,76 @@ const ModalGaleria = ({ isOpen, onClose, onSelectImagem, categoria = null }) => 
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content galeria-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Galeria de Imagens</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <h3>Galeria de Imagens</h3>
+          <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
-        <div className="galeria-controls">
-          <select 
-            value={categoriaSelecionada}
-            onChange={(e) => setCategoriaSelecionada(e.target.value)}
-            className="categoria-select"
-          >
-            <option value="">Todas as categorias</option>
-            {categorias.map(cat => (
-              <option key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </option>
-            ))}
-          </select>
+        <div className="galeria-container">
+          <div className="galeria-header">
+            <div className="galeria-categorias">
+              {categorias.map(cat => (
+                <button
+                  key={cat}
+                  className={`categoria-btn ${categoriaAtual === cat ? 'active' : ''}`}
+                  onClick={() => setCategoriaAtual(cat)}
+                >
+                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="upload-area">
-            <label className="upload-btn">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleUpload}
-                disabled={uploading}
-                style={{ display: 'none' }}
-              />
-              {uploading ? 'Enviando...' : '+ Adicionar Imagem'}
+            <input
+              type="file"
+              id="upload-imagem"
+              accept="image/*"
+              onChange={handleFileUpload}
+              style={{ display: 'none' }}
+              disabled={uploading}
+            />
+            <label htmlFor="upload-imagem" className="upload-label">
+              {uploading ? 'Fazendo upload...' : '+ Adicionar Imagem'}
             </label>
           </div>
-        </div>
 
-        {loading ? (
-          <div className="loading">Carregando imagens...</div>
-        ) : (
-          <div className="galeria-grid">
-            {galeria.length === 0 ? (
-              <div className="empty-gallery">
-                <div>🖼️</div>
-                <p>Nenhuma imagem encontrada</p>
-                <p>Faça upload de uma imagem para começar</p>
-              </div>
-            ) : (
-              galeria.map(imagem => (
-                <div
-                  key={imagem.id}
-                  className="galeria-item"
-                  onClick={() => onSelectImagem(imagem.url)}
-                >
-                  <img src={imagem.url} alt={imagem.nome} />
-                  <div className="image-info">
-                    <span className="image-name">{imagem.nome}</span>
-                    {imagem.categoria && (
-                      <span className="image-category">{imagem.categoria}</span>
-                    )}
+          {loading ? (
+            <div className="galeria-vazia">Carregando...</div>
+          ) : galeria.length > 0 ? (
+            <div className="galeria-grid">
+              {galeria
+                .filter(img => img.categoria === categoriaAtual)
+                .map(imagem => (
+                  <div
+                    key={imagem.id}
+                    className={`galeria-item ${imagemSelecionada === imagem.url ? 'selected' : ''}`}
+                    onClick={() => setImagemSelecionada(imagem.url)}
+                  >
+                    <img src={imagem.url} alt={imagem.nome} />
                   </div>
-                </div>
-              ))
-            )}
-          </div>
-        )}
+                ))
+              }
+            </div>
+          ) : (
+            <div className="galeria-vazia">
+              Nenhuma imagem encontrada
+              <br />
+              <small>Faça upload de uma imagem para começar</small>
+            </div>
+          )}
 
-        <div className="modal-footer">
-          <button className="btn-secondary" onClick={onClose}>
-            Fechar
-          </button>
+          <div className="galeria-actions">
+            <button
+              className="select-btn"
+              onClick={handleSelecionar}
+              disabled={!imagemSelecionada}
+            >
+              Selecionar Imagem
+            </button>
+            <button className="cancel-btn" onClick={onClose}>
+              Fechar
+            </button>
+          </div>
         </div>
       </div>
     </div>
