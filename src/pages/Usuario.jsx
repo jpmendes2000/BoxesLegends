@@ -5,7 +5,23 @@ import Navbar from '../components/Navbar';
 import InputComGaleria from '../components/InputComGaleria';
 import { supabase } from '../supabase';
 
-// Funções de criptografia (se ainda precisar para outras coisas)
+// Função para descriptografar o email (a mesma do supabase.js)
+function decryptEmail(encryptedEmail, key = 'minha_master_pass_dev_2025') {
+  try {
+    const decoded = atob(encryptedEmail);
+    let result = '';
+    for (let i = 0; i < decoded.length; i++) {
+      const charCode = decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+      result += String.fromCharCode(charCode);
+    }
+    return result;
+  } catch (error) {
+    console.error('Erro ao descriptografar email:', error);
+    return encryptedEmail; // Retorna o original se não conseguir descriptografar
+  }
+}
+
+// Funções de criptografia para o localStorage
 const encryptData = (data, key = 'my-secret-key-123') => {
   try {
     const text = JSON.stringify(data);
@@ -37,7 +53,13 @@ const decryptData = (encryptedData, key = 'my-secret-key-123') => {
 };
 
 export const salvarUsuario = (usuario) => {
-  const encrypted = encryptData(usuario);
+  // Antes de salvar, garante que o email está descriptografado para o frontend
+  const usuarioComEmailDescriptografado = {
+    ...usuario,
+    email: usuario.emailDescriptografado || decryptEmail(usuario.email) || usuario.email
+  };
+  
+  const encrypted = encryptData(usuarioComEmailDescriptografado);
   if (encrypted) {
     localStorage.setItem('user_encrypted', encrypted);
     localStorage.removeItem('usuario');
@@ -48,12 +70,21 @@ export const salvarUsuario = (usuario) => {
 const carregarUsuario = () => {
   const encryptedUser = localStorage.getItem('user_encrypted');
   if (encryptedUser) {
-    return decryptData(encryptedUser);
+    const usuario = decryptData(encryptedUser);
+    // Garante que o email está descriptografado
+    if (usuario && usuario.email && usuario.email.includes('==')) {
+      usuario.emailDescriptografado = decryptEmail(usuario.email);
+    }
+    return usuario;
   }
   
   const userLegacy = localStorage.getItem('user');
   if (userLegacy) {
     const usuario = JSON.parse(userLegacy);
+    // Garante que o email está descriptografado
+    if (usuario && usuario.email && usuario.email.includes('==')) {
+      usuario.emailDescriptografado = decryptEmail(usuario.email);
+    }
     salvarUsuario(usuario);
     localStorage.removeItem('user');
     return usuario;
@@ -62,6 +93,10 @@ const carregarUsuario = () => {
   const usuarioLegacy = localStorage.getItem('usuario');
   if (usuarioLegacy) {
     const usuario = JSON.parse(usuarioLegacy);
+    // Garante que o email está descriptografado
+    if (usuario && usuario.email && usuario.email.includes('==')) {
+      usuario.emailDescriptografado = decryptEmail(usuario.email);
+    }
     salvarUsuario(usuario);
     localStorage.removeItem('usuario');
     return usuario;
@@ -113,16 +148,22 @@ function Usuario() {
         return;
       }
 
-      setUsuario(usuarioLogado);
+      // Garante que temos o email descriptografado
+      const usuarioComEmailCorreto = {
+        ...usuarioLogado,
+        email: usuarioLogado.emailDescriptografado || decryptEmail(usuarioLogado.email) || usuarioLogado.email
+      };
+
+      setUsuario(usuarioComEmailCorreto);
       setEditData({
-        foto_perfil: usuarioLogado.foto_perfil || '',
-        nome: usuarioLogado.nome || '',
-        descricao_perfil: usuarioLogado.descricao_perfil || '',
-        genero: usuarioLogado.genero || 'prefiro não informar',
+        foto_perfil: usuarioComEmailCorreto.foto_perfil || '',
+        nome: usuarioComEmailCorreto.nome || '',
+        descricao_perfil: usuarioComEmailCorreto.descricao_perfil || '',
+        genero: usuarioComEmailCorreto.genero || 'prefiro não informar',
         senha: ''
       });
       
-      carregarPersonagens(usuarioLogado.id);
+      carregarPersonagens(usuarioComEmailCorreto.id);
       
     } catch (error) {
       console.error('Erro ao verificar usuário logado:', error);
@@ -210,7 +251,12 @@ function Usuario() {
         }
 
         if (data && data.length > 0) {
-          const updatedUsuario = { ...usuario, ...data[0] };
+          // Ao atualizar, mantém o email descriptografado
+          const updatedUsuario = { 
+            ...usuario, 
+            ...data[0],
+            email: usuario.email // Mantém o email descriptografado
+          };
           setUsuario(updatedUsuario);
           salvarUsuario(updatedUsuario);
           setShowEditPopup(false);
@@ -234,6 +280,19 @@ function Usuario() {
     localStorage.removeItem('token');
     alert('Logout realizado com sucesso!');
     navigate('/');
+  };
+
+  // Função para obter o email descriptografado
+  const getEmailDescriptografado = () => {
+    if (!usuario) return '';
+    
+    // Se já temos o email descriptografado, retorna ele
+    if (usuario.email && !usuario.email.includes('==')) {
+      return usuario.email;
+    }
+    
+    // Se não, tenta descriptografar
+    return decryptEmail(usuario.email) || usuario.email;
   };
 
   if (loading) {
@@ -337,11 +396,13 @@ function Usuario() {
             {usuario.descricao_perfil && (
               <p className="bio">{usuario.descricao_perfil}</p>
             )}
-            <p className="bio">{usuario.email}</p>
+            {/* Email descriptografado */}
+            <p className="bio">{getEmailDescriptografado()}</p>
             <p className="bio">Gênero: {usuario.genero}</p>
           </div>
         </div>
 
+        {/* ... (resto do componente igual) */}
         <div className="instagram-grid">
           <h3 className="vitrine-titulo">Personagens em Destaque</h3>
           <div className="grid-container">
@@ -385,7 +446,7 @@ function Usuario() {
         </button>
       </div>
 
-      {/* Popup de Edição */}
+      {/* Popup de Edição (mantido igual) */}
       {showEditPopup && (
         <div className="edit-popup-overlay">
           <div className="edit-popup">
