@@ -488,18 +488,21 @@
 .vitrine-icon {
   font-size: 2.5rem;
   margin-bottom: 10px;
+  cursor: default;
 }
 
 .vitrine-card h4 {
   margin: 0 0 8px 0;
   font-size: 1rem;
   color: var(--text);
+  cursor: default;
 }
 
 .vitrine-card p {
   margin: 0;
   font-size: 0.9rem;
   color: rgba(255,255,255,0.7);
+  cursor: default;
 }
 
 .vitrine-card small {

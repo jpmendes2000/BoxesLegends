@@ -2,17 +2,16 @@
 import { useState, useEffect } from 'react';
 import { useGaleria } from '../components/GaleriaContext';
 
-const ModalGaleria = ({ isOpen, onClose, onSelectImagem, categoria = null }) => {
-  const { galeria, loading, categorias, carregarGaleria, uploadImagem, adicionarImagem } = useGaleria();
-  const [categoriaAtual, setCategoriaAtual] = useState(categoria || 'perfis');
+const ModalGaleria = ({ isOpen, onClose, onSelectImagem, categoria = 'perfis' }) => {
+  const { galeria, loading, carregarGaleria, uploadImagem, adicionarImagem } = useGaleria();
   const [imagemSelecionada, setImagemSelecionada] = useState(null);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      carregarGaleria(categoriaAtual);
+      carregarGaleria(categoria);
     }
-  }, [isOpen, categoriaAtual, carregarGaleria]);
+  }, [isOpen, categoria, carregarGaleria]);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -26,7 +25,7 @@ const ModalGaleria = ({ isOpen, onClose, onSelectImagem, categoria = null }) => 
 
     setUploading(true);
     try {
-      const imagem = await uploadImagem(file, categoriaAtual);
+      const imagem = await uploadImagem(file, categoria);
       const imagemSalva = await adicionarImagem(imagem);
       
       // Seleciona a imagem automaticamente após upload
@@ -57,20 +56,6 @@ const ModalGaleria = ({ isOpen, onClose, onSelectImagem, categoria = null }) => 
         </div>
 
         <div className="galeria-container">
-          <div className="galeria-header">
-            <div className="galeria-categorias">
-              {categorias.map(cat => (
-                <button
-                  key={cat}
-                  className={`categoria-btn ${categoriaAtual === cat ? 'active' : ''}`}
-                  onClick={() => setCategoriaAtual(cat)}
-                >
-                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className="upload-area">
             <input
               type="file"
@@ -86,11 +71,11 @@ const ModalGaleria = ({ isOpen, onClose, onSelectImagem, categoria = null }) => 
           </div>
 
           {loading ? (
-            <div className="galeria-vazia">Carregando...</div>
-          ) : galeria.length > 0 ? (
+            <div className="galeria-vazia">Carregando imagens...</div>
+          ) : galeria.filter(img => img.categoria === categoria).length > 0 ? (
             <div className="galeria-grid">
               {galeria
-                .filter(img => img.categoria === categoriaAtual)
+                .filter(img => img.categoria === categoria)
                 .map(imagem => (
                   <div
                     key={imagem.id}

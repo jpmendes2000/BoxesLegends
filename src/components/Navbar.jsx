@@ -89,6 +89,18 @@ function Navbar() {
     setMenuOpen(false);
   };
 
+  // Função para clicar na logo/foto de perfil
+  const handleLogoClick = () => {
+    if (user) {
+      // Se está logado, vai para a página do usuário
+      navigate('/usuario');
+    } else {
+      // Se não está logado, vai para a home
+      navigate('/');
+    }
+    setMenuOpen(false);
+  };
+
   return (
     <>
       {/* Botão hamburger para mobile */}
@@ -103,8 +115,40 @@ function Navbar() {
       </button>
 
       <nav className={`container-superior-menu ${menuOpen ? 'menu-open' : ''}`}>
-        <div className="logo">
-          <img src={logoImage} alt="Logo Boxes Legends" />
+        <div className="logo" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
+          {user && user.foto_perfil ? (
+            // Foto de perfil do usuário quando está logado
+            <img 
+              src={user.foto_perfil} 
+              alt={`Foto de ${user.nome || user.name}`}
+              style={{
+                width: '92px',
+                height: '92px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '2px solid var(--accent)',
+                transition: 'all 0.3s ease'
+              }}
+              onError={(e) => {
+                // Se a foto não carregar, mostra a logo padrão
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'block';
+              }}
+            />
+          ) : (
+            // Logo padrão quando não está logado ou não tem foto
+            <img 
+              src={logoImage} 
+              alt="Logo Boxes Legends" 
+              style={{
+                width: '92px',
+                height: '92px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '2px solid var(--accent)'
+              }}
+            />
+          )}
         </div>
 
         <div className="top-spacer" />
@@ -149,6 +193,14 @@ function Navbar() {
           onClick={() => setMenuOpen(false)}
         />
       )}
+
+      {/* CSS adicional para hover na foto */}
+      <style jsx>{`
+        .logo img:hover {
+          transform: scale(1.05);
+          box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+        }
+      `}</style>
     </>
   );
 }

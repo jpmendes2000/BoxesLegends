@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import InputComGaleria from '../components/InputComGaleria';
+import { supabase } from '../supabase';
 
-// Funções de criptografia (mantidas do código anterior)
+// Funções de criptografia (se ainda precisar para outras coisas)
 const encryptData = (data, key = 'my-secret-key-123') => {
   try {
     const text = JSON.stringify(data);
@@ -82,14 +83,29 @@ function Usuario() {
     genero: '',
     senha: ''
   });
+  const [supabaseStatus, setSupabaseStatus] = useState('verificando...');
 
   useEffect(() => {
+    verificarSupabase();
     verificarUsuarioLogado();
   }, [navigate]);
+
+  // Função para verificar se o Supabase está respondendo
+  const verificarSupabase = async () => {
+    try {
+      const { data, error } = await supabase.from('usuarios').select('count').limit(1);
+      if (error) throw error;
+      setSupabaseStatus('online 🟢');
+    } catch (error) {
+      setSupabaseStatus('offline 🔴');
+      console.error('Supabase offline:', error);
+    }
+  };
 
   const verificarUsuarioLogado = () => {
     try {
       const usuarioLogado = carregarUsuario();
+      console.log('👤 Usuário carregado:', usuarioLogado);
       
       if (!usuarioLogado) {
         alert('Você precisa fazer login primeiro!');
@@ -106,8 +122,7 @@ function Usuario() {
         senha: ''
       });
       
-      const idUsuario = usuarioLogado.id_usuario || usuarioLogado.id;
-      carregarPersonagens(idUsuario);
+      carregarPersonagens(usuarioLogado.id);
       
     } catch (error) {
       console.error('Erro ao verificar usuário logado:', error);
@@ -118,11 +133,21 @@ function Usuario() {
 
   const carregarPersonagens = async (idUsuario) => {
     try {
-      const response = await fetch(`http://localhost:3001/usuario/${idUsuario}/personagens`);
+      console.log('🎭 Carregando personagens para usuário:', idUsuario);
       
-      if (response.ok) {
-        const data = await response.json();
-        setPersonagens(data.personagens?.slice(0, 9) || []);
+      // Como você está usando Supabase, vamos buscar os personagens diretamente
+      const { data, error } = await supabase
+        .from('personagens')
+        .select('*')
+        .eq('id_usuario', idUsuario)
+        .limit(3);
+
+      if (error) {
+        console.error('Erro ao carregar personagens:', error);
+        setPersonagens([]);
+      } else {
+        console.log('Personagens carregados:', data);
+        setPersonagens(data || []);
       }
     } catch (error) {
       console.error('Erro ao carregar personagens:', error);
@@ -142,43 +167,60 @@ function Usuario() {
   };
 
   const handleSaveEdits = async () => {
-    const { nome, descricao_perfil, genero, senha, foto_perfil } = editData;
-    const idUsuario = usuario.id_usuario || usuario.id;
-
-    if (!idUsuario) {
-      alert('Erro: ID do usuário não encontrado');
+    if (!usuario || !usuario.id) {
+      alert('Erro: Usuário não encontrado');
       return;
     }
 
+    const { nome, descricao_perfil, genero, senha, foto_perfil } = editData;
+
+    // Preparar updates
     const updates = {};
     if (nome && nome !== usuario.nome) updates.nome = nome;
     if (descricao_perfil !== usuario.descricao_perfil) updates.descricao_perfil = descricao_perfil;
     if (genero !== usuario.genero) updates.genero = genero;
     if (foto_perfil !== usuario.foto_perfil) updates.foto_perfil = foto_perfil;
-    if (senha) updates.senha = senha;
+    
+    // Se tiver senha, vamos hash ela
+    let senhaHash = null;
+    if (senha) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(senha);
+      const hash = await crypto.subtle.digest('SHA-256', data);
+      senhaHash = Array.from(new Uint8Array(hash))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      updates.senha = senhaHash;
+    }
+
+    console.log('🔄 Atualizando usuário:', updates);
 
     if (Object.keys(updates).length > 0) {
       try {
-        const response = await fetch(`http://localhost:3001/usuario/${idUsuario}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updates),
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          const updatedUsuario = { ...usuario, ...updates };
+        const { data, error } = await supabase
+          .from('usuarios')
+          .update(updates)
+          .eq('id', usuario.id)
+          .select();
+
+        if (error) {
+          console.error('❌ Erro do Supabase:', error);
+          alert('Erro ao atualizar perfil: ' + error.message);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          const updatedUsuario = { ...usuario, ...data[0] };
           setUsuario(updatedUsuario);
           salvarUsuario(updatedUsuario);
           setShowEditPopup(false);
           alert('Perfil atualizado com sucesso!');
         } else {
-          alert('Erro ao atualizar perfil: ' + data.erro);
+          alert('Nenhum dado retornado após atualização');
         }
       } catch (error) {
-        console.error('Erro ao atualizar perfil:', error);
-        alert('Erro ao atualizar perfil');
+        console.error('💥 Erro ao atualizar perfil:', error);
+        alert('Erro ao atualizar perfil: ' + error.message);
       }
     } else {
       alert('Nenhuma alteração detectada!');
@@ -199,18 +241,44 @@ function Usuario() {
       <div className="login-container">
         <div className="login-left" style={{ width: '100%' }}>
           <h2>Carregando seu perfil...</h2>
+          <p>Status do Supabase: {supabaseStatus}</p>
         </div>
       </div>
     );
   }
 
   if (!usuario) {
-    return null;
+    return (
+      <div className="login-container">
+        <div className="login-left" style={{ width: '100%' }}>
+          <h2>Usuário não encontrado</h2>
+          <button onClick={() => navigate('/login')} className="upload-foto-btn">
+            Fazer Login
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="login-container">
       <Navbar />
+      
+      {/* Status do Supabase */}
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        background: supabaseStatus.includes('online') ? '#4CAF50' : '#f44336',
+        color: 'white',
+        padding: '5px 10px',
+        borderRadius: '4px',
+        fontSize: '12px',
+        zIndex: 1000
+      }}>
+        Supabase: {supabaseStatus}
+      </div>
+
       <button className="back-btn-fixed" onClick={() => navigate('/')}>
         ← Voltar pra Home
       </button>
@@ -219,6 +287,20 @@ function Usuario() {
         <h1 className="login-title">
           Meu Perfil<span className="dot">.</span>
         </h1>
+
+        {supabaseStatus === 'offline 🔴' && (
+          <div style={{
+            background: '#f44336',
+            color: 'white',
+            padding: '15px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            textAlign: 'center'
+          }}>
+            ⚠️ <strong>Supabase Offline</strong><br/>
+            Verifique sua conexão com a internet.
+          </div>
+        )}
 
         <div className="profile-header">
           <div className="profile-photo">
@@ -265,7 +347,7 @@ function Usuario() {
           <div className="grid-container">
             {personagens.length > 0 ? (
               personagens.map((personagem, index) => (
-                <div key={index} className="grid-item">
+                <div key={personagem.id || index} className="grid-item">
                   <div className="vitrine-card">
                     <div className="vitrine-icon">🎭</div>
                     <h4>{personagem.nome}</h4>
@@ -308,6 +390,20 @@ function Usuario() {
         <div className="edit-popup-overlay">
           <div className="edit-popup">
             <h2>Editar Perfil</h2>
+            
+            {supabaseStatus === 'offline 🔴' && (
+              <div style={{
+                background: '#ff9800',
+                color: 'white',
+                padding: '10px',
+                borderRadius: '6px',
+                marginBottom: '15px',
+                textAlign: 'center',
+                fontSize: '14px'
+              }}>
+                ⚠️ Supabase Offline - Alterações não serão salvas
+              </div>
+            )}
             
             <div className="edit-foto-section">
               <div className="edit-foto-preview">
@@ -381,8 +477,12 @@ function Usuario() {
               </div>
 
               <div className="edit-popup-buttons">
-                <button className="save-btn" onClick={handleSaveEdits}>
-                  Salvar Alterações
+                <button 
+                  className="save-btn" 
+                  onClick={handleSaveEdits}
+                  disabled={supabaseStatus === 'offline 🔴'}
+                >
+                  {supabaseStatus === 'offline 🔴' ? 'Supabase Offline' : 'Salvar Alterações'}
                 </button>
                 <button 
                   className="cancel-btn" 
